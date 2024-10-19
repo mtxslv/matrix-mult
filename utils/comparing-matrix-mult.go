@@ -3,8 +3,30 @@ package main
 import (
     "fmt"
     "log"
+    "math/rand/v2"
+    "math"
     "time"
 )
+
+// generateMatrix creates an n x n matrix with all elements set to the provided value or a random integer
+func generateMatrix(n, value int, r *rand.Rand) [][]int {
+    // Initialize a new random generator using PCG
+
+    matrix := make([][]int, n) // Create an array of arrays (n x n)
+
+    for i := 0; i < n; i++ {
+        matrix[i] = make([]int, n) // Create each row
+        for j := 0; j < n; j++ {
+            if value < 0 { // If value is not set (assuming 0 as the unset marker)
+                matrix[i][j] = int(r.Int32N(150)) // Use random integer between 0 and 149
+            } else {
+                matrix[i][j] = value // Set the provided value
+            }
+        }
+    }
+
+    return matrix
+}
 
 // compareResults compares two matrices (Strassen and regular) and returns true if they are identical.
 func compareResults(strassen, regular [][]int) bool {
@@ -143,74 +165,86 @@ func strassen(A, B [][]int) [][]int {
 
 // Main function to test Strassen matrix multiplication
 func main() {
+    r := rand.New(rand.NewPCG(1, 2))
     // Example matrices (4x4)
-    A := [][]int{
-        {1, 2, 0, 0, 1, 2, 0, 0},
-        {3, 4, 0, 0, 3, 4, 0, 0},
-        {0, 0, 1, 2, 0, 0, 1, 2},
-        {0, 0, 3, 4, 0, 0, 3, 4},
-        {1, 2, 0, 0, 1, 2, 0, 0},
-        {3, 4, 0, 0, 3, 4, 0, 0},
-        {0, 0, 1, 2, 0, 0, 1, 2},
-        {0, 0, 3, 4, 0, 0, 3, 4},		
-    }
-// 
-    B := [][]int{
-        {5, 6, 0, 0, 5, 6, 0, 0},
-        {7, 8, 0, 0, 7, 8, 0, 0},
-        {0, 0, 5, 6, 0, 0, 5, 6},
-        {0, 0, 7, 8, 0, 0, 7, 8},
-        {5, 6, 0, 0, 5, 6, 0, 0},
-        {7, 8, 0, 0, 7, 8, 0, 0},
-        {0, 0, 5, 6, 0, 0, 5, 6},
-        {0, 0, 7, 8, 0, 0, 7, 8},
-    }
+    for i := 1; i < 2; i++ {
+		power := math.Pow(4, float64(i))
+        n:=int(power)
+        A := generateMatrix(n, -1, r) // trigger random number
+        B := generateMatrix(n, -1, r) // trigger random number
+        C_regular := generateMatrix(n, 0, r)
+//         A := [][]int{
+//             {1, 2, 0, 0, 1, 2, 0, 0},
+//             {3, 4, 0, 0, 3, 4, 0, 0},
+//             {0, 0, 1, 2, 0, 0, 1, 2},
+//             {0, 0, 3, 4, 0, 0, 3, 4},
+//             {1, 2, 0, 0, 1, 2, 0, 0},
+//             {3, 4, 0, 0, 3, 4, 0, 0},
+//             {0, 0, 1, 2, 0, 0, 1, 2},
+//             {0, 0, 3, 4, 0, 0, 3, 4},		
+//         }
+// //  
+//         B := [][]int{
+//             {5, 6, 0, 0, 5, 6, 0, 0},
+//             {7, 8, 0, 0, 7, 8, 0, 0},
+//             {0, 0, 5, 6, 0, 0, 5, 6},
+//             {0, 0, 7, 8, 0, 0, 7, 8},
+//             {5, 6, 0, 0, 5, 6, 0, 0},
+//             {7, 8, 0, 0, 7, 8, 0, 0},
+//             {0, 0, 5, 6, 0, 0, 5, 6},
+//             {0, 0, 7, 8, 0, 0, 7, 8},
+//         }
 
-    C_regular := [][]int{
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-    }
+//         C_regular := [][]int{
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//             {0, 0, 0, 0, 0, 0, 0, 0},
+//         }
 
-    // Perform Strassen matrix multiplication
-    start_strassen := time.Now()
-    C_strassen := strassen(A, B)
-    t_strassen := time.Now()
-    elapsed_strassen := t_strassen.Sub(start_strassen)
+        // Perform Strassen matrix multiplication
+        start_strassen := time.Now()
+        C_strassen := strassen(A, B)
+        t_strassen := time.Now()
+        elapsed_strassen := t_strassen.Sub(start_strassen)
 
-    // Perform regular matrix multiplication
-    start_regular := time.Now()
-    C_ans := matrixMult(A,B,C_regular,4)
-    t_regular := time.Now()
-    elapsed_regular := t_regular.Sub(start_regular)
+        // Perform regular matrix multiplication
+        start_regular := time.Now()
+        C_ans := matrixMult(A,B,C_regular,n)
+        t_regular := time.Now()
+        elapsed_regular := t_regular.Sub(start_regular)
 
-	// Checking equal matrices
-	if !compareResults(C_ans, C_strassen) {
-		defer func() {
-			if r := recover(); r != nil {
-				log.Fatalf("Error: The matrices are not equal: %v", r)
-			}
-		}()
-		log.Println("Strassen and regular matrices are equal!")
-	}    
+	    // Checking equal matrices
+	    if !compareResults(C_ans, C_strassen) {
+	    	defer func() {
+	    		if r := recover(); r != nil {
+	    			log.Fatalf("Error: The matrices are not equal: %v", r)
+        	    	log.Println("Strassen and regular matrices are different!")
 
-    // Print the result matrix
-    fmt.Println("Result of Strassen matrix multiplication:")
-    for _, row := range C_strassen {
-        fmt.Println(row)
-    }
-    fmt.Println("Elapsed Time: ", elapsed_strassen)
+	    		}
+	    	}()
+	    	log.Println("STRASSEN AND REGULAR DIFFERENT!")
+	    }else{
+            // Print the result matrix
+            fmt.Println("Result of Strassen matrix multiplication:")
+            for _, row := range C_strassen {
+                fmt.Println(row)
+            }
+            fmt.Println("Elapsed Time: ", elapsed_strassen)
 
-    fmt.Println("Result of Regular matrix multiplication:")
-    for _, row := range C_ans {
-        fmt.Println(row)
-    }
-    fmt.Println("Elapsed Time: ", elapsed_regular)    
+            fmt.Println("Result of Regular matrix multiplication:")
+            for _, row := range C_ans {
+                fmt.Println(row)
+            }
+            fmt.Println("Elapsed Time: ", elapsed_regular)    
+
+            fmt.Println(n)
+        }
+    }    
 
 }
 	// TESTING MATRIX SUMMATION
