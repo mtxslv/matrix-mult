@@ -48,6 +48,30 @@ func splitMatrix(matrix [][]int) ([][]int, [][]int, [][]int, [][]int) {
     return A11, A12, A21, A22
 }
 
+// combineMatrix combines four submatrices into one larger matrix
+func combineMatrix(A11, A12, A21, A22 [][]int) [][]int {
+    half := len(A11)  // Size of the submatrices (A11, A12, A21, A22)
+    size := half * 2  // Size of the resulting larger matrix
+
+    // Initialize the result matrix with all zeroes
+    result := make([][]int, size)
+    for i := 0; i < size; i++ {
+        result[i] = make([]int, size)
+    }
+
+    // Fill the result matrix with values from the four submatrices
+    for i := 0; i < half; i++ {
+        for j := 0; j < half; j++ {
+            result[i][j] = A11[i][j]            // Top-left
+            result[i][j+half] = A12[i][j]       // Top-right
+            result[i+half][j] = A21[i][j]       // Bottom-left
+            result[i+half][j+half] = A22[i][j]  // Bottom-right
+        }
+    }
+
+    return result
+}
+
 func main() {
 
 }
@@ -67,3 +91,31 @@ func main() {
     // fmt.Println("A12:", A12)
     // fmt.Println("A21:", A21)
     // fmt.Println("A22:", A22)
+
+	// TESTING MATRIX AGGREGATION
+	// Example submatrices
+	// A11 := [][]int{
+		// {1, 2},
+		// {3, 4},
+	// }
+	// A12 := [][]int{
+		// {5, 6},
+		// {7, 8},
+	// }
+	// A21 := [][]int{
+		// {9, 10},
+		// {11, 12},
+	// }
+	// A22 := [][]int{
+		// {13, 14},
+		// {15, 16},
+	// }
+// 
+	Combine the submatrices into one large matrix
+	// result := combineMatrix(A11, A12, A21, A22)
+// 
+	Print the result
+	// fmt.Println("Combined matrix:")
+	// for _, row := range result {
+		// fmt.Println(row)
+	// }
