@@ -167,7 +167,7 @@ func strassen(A, B [][]int) [][]int {
 func main() {
     r := rand.New(rand.NewPCG(1, 2))
     // Example matrices (4x4)
-    for i := 1; i < 2; i++ {
+    for i := 1; i < 10; i++ {
 		power := math.Pow(4, float64(i))
         n:=int(power)
         A := generateMatrix(n, -1, r) // trigger random number
@@ -230,19 +230,19 @@ func main() {
 	    	log.Println("STRASSEN AND REGULAR DIFFERENT!")
 	    }else{
             // Print the result matrix
-            fmt.Println("Result of Strassen matrix multiplication:")
-            for _, row := range C_strassen {
-                fmt.Println(row)
-            }
-            fmt.Println("Elapsed Time: ", elapsed_strassen)
+            // fmt.Println("Result of Strassen matrix multiplication:")
+            // for _, row := range C_strassen {
+            //     fmt.Println(row)
+            // }
+            // fmt.Println("Elapsed Time: ", elapsed_strassen)
 
-            fmt.Println("Result of Regular matrix multiplication:")
-            for _, row := range C_ans {
-                fmt.Println(row)
-            }
-            fmt.Println("Elapsed Time: ", elapsed_regular)    
-
-            fmt.Println(n)
+            // fmt.Println("Result of Regular matrix multiplication:")
+            // for _, row := range C_ans {
+            //     fmt.Println(row)
+            // }
+            // fmt.Println("Elapsed Time: ", elapsed_regular)    
+            fmt.Println("N: ", n, " | Strassen Time: ", elapsed_strassen, " | Regular Time: ", elapsed_regular)
+            // fmt.Println(n)
         }
     }    
 
