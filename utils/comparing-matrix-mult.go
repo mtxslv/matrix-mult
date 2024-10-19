@@ -2,8 +2,22 @@ package main
 
 import (
     "fmt"
+    "log"
     "time"
 )
+
+// compareResults compares two matrices (Strassen and regular) and returns true if they are identical.
+func compareResults(strassen, regular [][]int) bool {
+	n := len(strassen)
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			if strassen[i][j] != regular[i][j] {
+				return false
+			}
+		}
+	}
+	return true
+}
 
 // matrixMult performs matrix multiplication of two n x n matrices
 func matrixMult(a, b, c [][]int, n int) [][]int {
@@ -162,6 +176,16 @@ func main() {
     C_ans := matrixMult(A,B,C_regular,4)
     t_regular := time.Now()
     elapsed_regular := t_regular.Sub(start_regular)
+
+	// Checking equal matrices
+	if !compareResults(C_ans, C_strassen) {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Fatalf("Error: The matrices are not equal: %v", r)
+			}
+		}()
+		log.Println("Strassen and regular matrices are equal!")
+	}    
 
     // Print the result matrix
     fmt.Println("Result of Strassen matrix multiplication:")
