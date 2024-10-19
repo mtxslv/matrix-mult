@@ -2,8 +2,11 @@ package main
 
 import "fmt"
 
-func matrixAdd(a, b, c [][]int, n int) [][]int {
+func matrixAdd(a, b [][]int) [][]int {
+	n := len(a)
+	c := make([][]int, n)
     for i := 0; i < n; i++ {
+		c[i] = make([]int, n)
         for j := 0; j < n; j++ {
             c[i][j] = a[i][j] + b[i][j]
         }
@@ -11,8 +14,11 @@ func matrixAdd(a, b, c [][]int, n int) [][]int {
     return c
 }
 
-func matrixSubtract(a, b, c [][]int, n int) [][]int {
+func matrixSubtract(a, b [][]int) [][]int {
+	n := len(a)
+	c := make([][]int, n)
     for i := 0; i < n; i++ {
+		c[i] = make([]int, n)
         for j := 0; j < n; j++ {
             c[i][j] = a[i][j] - b[i][j]
         }
@@ -72,10 +78,77 @@ func combineMatrix(A11, A12, A21, A22 [][]int) [][]int {
     return result
 }
 
-func main() {
+// Strassen performs Strassen matrix multiplication on two matrices A and B.
+func strassen(A, B [][]int) [][]int {
+    size := len(A)
 
+    // Base case for 1x1 matrix
+    if size == 1 {
+        return [][]int{{A[0][0] * B[0][0]}}
+    }
+
+    // Split matrices into quadrants
+    A11, A12, A21, A22 := splitMatrix(A)
+    B11, B12, B21, B22 := splitMatrix(B)
+
+    // Compute the 7 Strassen products
+    M1 := strassen(matrixAdd(A11, A22), matrixAdd(B11, B22))       // M1 = (A11 + A22) * (B11 + B22)
+    M2 := strassen(matrixAdd(A21, A22), B11)                       // M2 = (A21 + A22) * B11
+    M3 := strassen(A11, matrixSubtract(B12, B22))                  // M3 = A11 * (B12 - B22)
+    M4 := strassen(A22, matrixSubtract(B21, B11))                  // M4 = A22 * (B21 - B11)
+    M5 := strassen(matrixAdd(A11, A12), B22)                       // M5 = (A11 + A12) * B22
+    M6 := strassen(matrixSubtract(A21, A11), matrixAdd(B11, B12))  // M6 = (A21 - A11) * (B11 + B12)
+    M7 := strassen(matrixSubtract(A12, A22), matrixAdd(B21, B22))  // M7 = (A12 - A22) * (B21 + B22)
+
+    // Combine the results to get the final quadrants of the result matrix
+    C11 := matrixAdd(matrixSubtract(matrixAdd(M1, M4), M5), M7)
+    C12 := matrixAdd(M3, M5)
+    C21 := matrixAdd(M2, M4)
+    C22 := matrixAdd(matrixSubtract(matrixAdd(M1, M3), M2), M6)
+
+    // Combine the four quadrants into a single matrix
+    return combineMatrix(C11, C12, C21, C22)
 }
 
+// Main function to test Strassen matrix multiplication
+func main() {
+    // Example matrices (4x4)
+    A := [][]int{
+        {1, 2, 0, 0},
+        {3, 4, 0, 0},
+        {0, 0, 1, 2},
+        {0, 0, 3, 4},
+    }
+
+    B := [][]int{
+        {5, 6, 0, 0},
+        {7, 8, 0, 0},
+        {0, 0, 5, 6},
+        {0, 0, 7, 8},
+    }
+
+    // Perform Strassen matrix multiplication
+    C := strassen(A, B)
+
+    // Print the result matrix
+    fmt.Println("Result of Strassen matrix multiplication:")
+    for _, row := range C {
+        fmt.Println(row)
+    }
+}
+	// TESTING MATRIX SUMMATION
+	// A11 := [][]int{
+		// {1, 2},
+		// {3, 4},
+	// }
+	// A12 := [][]int{
+		// {5, 6},
+		// {7, 8},
+	// }
+	// C := matrixAdd(A11, A12)
+    // for _, row := range C {
+        // fmt.Println(row)
+    // } 
 
     // TESTING MATRIX SPLITTING
     // matrix := [][]int{
@@ -111,10 +184,10 @@ func main() {
 		// {15, 16},
 	// }
 // 
-	Combine the submatrices into one large matrix
+	// Combine the submatrices into one large matrix
 	// result := combineMatrix(A11, A12, A21, A22)
 // 
-	Print the result
+	// Print the result
 	// fmt.Println("Combined matrix:")
 	// for _, row := range result {
 		// fmt.Println(row)
